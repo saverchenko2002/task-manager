@@ -34,4 +34,11 @@ public class User {
             @JoinColumn(name = "ROLE_ID")
     })
     private Set<Role> roles = new HashSet<>();
+
+    public User(User user) {
+        id = user.getId();
+        email = user.getEmail();
+        username = user.getUsername();
+        password = user.getPassword();
+    }
 }
