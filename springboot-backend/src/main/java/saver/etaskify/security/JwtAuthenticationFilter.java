@@ -17,8 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${app.jwt.header}")
@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(jwt) && jwtTokenValidator.validateToken(jwt)) {
                 Long userId = jwtTokenProvider.getUserIdFromJwt(jwt);
                 UserDetails userDetails = userDetailsService.loadUserById(userId);
-                List<GrantedAuthority> authorities = jwtTokenProvider.getAuthoritiesFromJwt(jwt);
+                Set<GrantedAuthority> authorities = jwtTokenProvider.getAuthoritiesFromJwt(jwt);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, jwt, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

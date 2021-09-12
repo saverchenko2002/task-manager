@@ -12,6 +12,7 @@ import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,12 +21,13 @@ public class JwtTokenProvider {
     private static final String AUTHORITIES_CLAIM = "authorities";
     @Value("${app.jwtSecret}")
     private String jwtSecret;
-    @Value("{app.jwtExpirationInMs}")
-    private long jwtExpirationIsMs;
+    @Value("${app.jwtExpirationInMs}")
+    private int jwtExpirationInMs;
 
     public String generateToken(UserDetailsImpl userDetails) {
-        Instant expiryDate = Instant.now().plusMillis(jwtExpirationIsMs);
+        Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
         String authorities = getUserAuthorities(userDetails);
+
         return Jwts.builder()
                 .setSubject(Long.toString(userDetails.getId()))
                 .setIssuedAt(Date.from(Instant.now()))
@@ -36,7 +38,7 @@ public class JwtTokenProvider {
     }
 
     public String generateTokenFromUserId(Long userId) {
-        Instant expiryDate = Instant.now().plusMillis(jwtExpirationIsMs);
+        Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
         return Jwts.builder()
                 .setSubject(Long.toString(userId))
                 .setIssuedAt(Date.from(Instant.now()))
@@ -54,14 +56,14 @@ public class JwtTokenProvider {
         return Long.parseLong(claims.getSubject());
     }
 
-    public List<GrantedAuthority> getAuthoritiesFromJwt(String token) {
+    public Set<GrantedAuthority> getAuthoritiesFromJwt(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
         return Arrays.stream(claims.get(AUTHORITIES_CLAIM).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     private String getUserAuthorities(UserDetailsImpl userDetails) {
