@@ -2,7 +2,6 @@ package saver.etaskify.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import saver.etaskify.model.Role;
 
 import java.util.Set;
 

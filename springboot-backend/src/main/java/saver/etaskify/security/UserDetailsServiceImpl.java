@@ -19,12 +19,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> dbUser = userRepository.findByUsername(username);
+
         return dbUser.map(UserDetailsImpl::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Couldn't find a matching user username in the database for " + username));
     }
 
     public UserDetails loadUserById(Long id) {
         Optional<User> dbUser = userRepository.findById(id);
+
         return dbUser.map(UserDetailsImpl::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Couldn't find a matching user id in the database for " + id));
     }

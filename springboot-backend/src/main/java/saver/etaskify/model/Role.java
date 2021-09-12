@@ -1,9 +1,6 @@
 package saver.etaskify.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -12,8 +9,8 @@ import java.util.Set;
 @Entity(name = "ROLE")
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@EqualsAndHashCode(exclude = "userList")
+@Getter
+@Setter
 public class Role {
 
     @Id

@@ -18,7 +18,8 @@ public class UserDetailsImpl extends User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles().stream()
+        System.out.println(getRoles().toString());
+        return super.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRole().name()))
                 .collect(Collectors.toList());
     }

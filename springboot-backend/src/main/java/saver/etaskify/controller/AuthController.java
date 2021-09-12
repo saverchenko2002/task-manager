@@ -95,15 +95,12 @@ public class AuthController {
                     .orElseThrow(() -> new RuntimeException("Error: Role ADMIN is not found"));
             roles.add(adminRole);
         }
-
         userRepository.save(createUserFromRequest(signupRequest, roles));
-        System.out.println(userRepository.findByUsername(signupRequest.getUsername()).get());
+
         return ResponseEntity.ok(new MessageResponse("User CREATED"));
     }
 
     private User createUserFromRequest(SignupRequest signupRequest, Set<Role> roles) {
         return new User(signupRequest.getEmail(), signupRequest.getUsername(), passwordEncoder.encode(signupRequest.getPassword()), roles);
     }
-
-
 }

@@ -9,8 +9,8 @@ import java.util.Set;
 @Entity(name = "USER")
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@EqualsAndHashCode(exclude = "roles")
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -39,6 +39,7 @@ public class User {
         email = user.getEmail();
         username = user.getUsername();
         password = user.getPassword();
+        roles = user.getRoles();
     }
 
     public User(String email, String username, String password, Set<Role> roles) {
