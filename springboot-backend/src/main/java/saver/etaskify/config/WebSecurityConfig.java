@@ -15,19 +15,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import saver.etaskify.security.JwtAuthenticationEntryPoint;
 import saver.etaskify.security.JwtAuthenticationFilter;
-import saver.etaskify.security.UserDetailsServiceImpl;
+import saver.etaskify.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthenticationEntryPoint jwtEntryPoint;
 
     @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+    public WebSecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthenticationEntryPoint jwtEntryPoint) {
+        this.userDetailsService = userDetailsService;
+        this.jwtEntryPoint = jwtEntryPoint;
+    }
 
+    public WebSecurityConfig(boolean disableDefaults, CustomUserDetailsService userDetailsService, JwtAuthenticationEntryPoint jwtEntryPoint) {
+        super(disableDefaults);
+        this.userDetailsService = userDetailsService;
+        this.jwtEntryPoint = jwtEntryPoint;
+    }
 
     @Override
     @Bean
@@ -47,13 +55,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+        http.cors()
+                .and()
+                .csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
-                    .antMatchers("/api/auth/**").permitAll()
-                    .antMatchers("/api/test/**").permitAll()
-                    .anyRequest().authenticated();
+                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/test/**").permitAll()
+                .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }

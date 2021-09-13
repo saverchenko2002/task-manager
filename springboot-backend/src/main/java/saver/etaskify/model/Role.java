@@ -24,4 +24,11 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> userList = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "role=" + role +
+                '}';
+    }
 }

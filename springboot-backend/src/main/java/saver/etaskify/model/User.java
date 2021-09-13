@@ -3,6 +3,8 @@ package saver.etaskify.model;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,12 +21,15 @@ public class User {
     private Long id;
 
     @Column(name = "EMAIL", unique = true)
+    @NotBlank(message = "User email cannot be null")
     private String email;
 
     @Column(name = "USERNAME", unique = true)
+    @NotBlank(message = "Username can not be blank")
     private String username;
 
     @Column(name = "PASSWORD")
+    @NotNull(message = "Password cannot be null")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -42,10 +47,14 @@ public class User {
         roles = user.getRoles();
     }
 
-    public User(String email, String username, String password, Set<Role> roles) {
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
+    public void addRole(Role role) {
+        roles.add(role);
+        role.getUserList().add(this);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" + "id=" + id + ", email='" + email + '\'' + "," +
+                " username='" + username + '\'' + ", roles=" + roles + '}';
     }
 }

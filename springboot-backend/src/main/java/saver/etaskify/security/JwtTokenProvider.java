@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import saver.etaskify.model.CustomUserDetails;
 
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,12 +24,12 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
-    public String generateToken(UserDetailsImpl userDetails) {
+    public String generateToken(CustomUserDetails customUserDetails) {
         Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
-        String authorities = getUserAuthorities(userDetails);
+        String authorities = getUserAuthorities(customUserDetails);
 
         return Jwts.builder()
-                .setSubject(Long.toString(userDetails.getId()))
+                .setSubject(Long.toString(customUserDetails.getId()))
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(expiryDate))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -39,6 +39,7 @@ public class JwtTokenProvider {
 
     public String generateTokenFromUserId(Long userId) {
         Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
+
         return Jwts.builder()
                 .setSubject(Long.toString(userId))
                 .setIssuedAt(Date.from(Instant.now()))
@@ -61,13 +62,14 @@ public class JwtTokenProvider {
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
+
         return Arrays.stream(claims.get(AUTHORITIES_CLAIM).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
 
-    private String getUserAuthorities(UserDetailsImpl userDetails) {
-        return userDetails
+    private String getUserAuthorities(CustomUserDetails customUserDetails) {
+        return customUserDetails
                 .getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
